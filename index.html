@@ -4,170 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roster Preference</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="header">
-        <h1>Roster Preference</h1>
-        <p class="subtitle">Fill once for current 2-week cycle</p>
-        <button id="devToggle" class="dev-toggle" aria-label="Toggle developer admin panel">DEV</button>
+        <div class="header-content">
+            <h1>✨ Roster Preference</h1>
+            <p class="subtitle">Select your shifts & leaves for the upcoming weeks</p>
+        </div>
+        <button id="devToggle" class="dev-toggle">👨‍💻 DEV</button>
     </header>
 
     <main class="container">
         <form id="preferenceForm" class="preference-form">
             <div id="lastSubmissionInfo" class="last-submission" style="display: none;">
-                <p>✓ You submitted on <strong id="lastSubmitTime"></strong></p>
+                <div class="submission-icon">🎉</div>
+                <div class="submission-text">
+                    <h3>All set!</h3>
+                    <p>You submitted on <strong id="lastSubmitTime"></strong></p>
+                </div>
             </div>
 
             <div class="form-section">
-                <h2>Agent Details</h2>
+                <div class="section-header">
+                    <span class="section-icon">🆔</span>
+                    <h2>Identity</h2>
+                </div>
                 
-                <div class="form-group">
-                    <label for="agentName">Name <span class="required">*</span></label>
-                    <input 
-                        type="text" 
-                        id="agentName" 
-                        list="nameList" 
-                        autocomplete="off"
-                        placeholder="Start typing name..."
-                        required
-                        aria-describedby="nameError"
-                    >
-                    <datalist id="nameList"></datalist>
-                    <span id="nameError" class="error-message" role="alert"></span>
-                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="agentName">Name</label>
+                        <input type="text" id="agentName" list="nameList" placeholder="Search your name..." required>
+                        <datalist id="nameList"></datalist>
+                        <span id="nameError" class="error-message"></span>
+                    </div>
 
-                <div class="form-group">
-                    <label for="empId">Employee ID <span class="required">*</span></label>
-                    <input 
-                        type="text" 
-                        id="empId" 
-                        list="empIdList" 
-                        autocomplete="off"
-                        placeholder="Start typing ID..."
-                        required
-                        aria-describedby="empIdError"
-                    >
-                    <datalist id="empIdList"></datalist>
-                    <span id="empIdError" class="error-message" role="alert"></span>
+                    <div class="form-group">
+                        <label for="empId">Employee ID</label>
+                        <input type="text" id="empId" list="empIdList" placeholder="Search Emp ID..." required>
+                        <datalist id="empIdList"></datalist>
+                        <span id="empIdError" class="error-message"></span>
+                    </div>
                 </div>
             </div>
 
             <div class="form-section">
-                <h2>Shift Preference</h2>
+                <div class="section-header">
+                    <span class="section-icon">⏰</span>
+                    <h2>Shift Preference</h2>
+                </div>
                 <div class="form-group">
-                    <label for="preferredShift">Preferred Shift <span class="required">*</span></label>
-                    <select id="preferredShift" required>
-                        <option value="">Select shift...</option>
-                        <option value="08:00 AM - 05:00 PM">08:00 AM - 05:00 PM</option>
-                        <option value="09:00 AM - 06:00 PM">09:00 AM - 06:00 PM</option>
-                        <option value="10:00 AM - 07:00 PM">10:00 AM - 07:00 PM</option>
-                        <option value="11:00 AM - 08:00 PM">11:00 AM - 08:00 PM</option>
-                        <option value="12:00 PM - 09:00 PM">12:00 PM - 09:00 PM</option>
-                        <option value="01:00 PM - 10:00 PM">01:00 PM - 10:00 PM</option>
-                        <option value="No preference">No preference</option>
-                    </select>
-                    <p class="helper-text">We'll try to honour preferred shift; final roster by manager.</p>
+                    <label for="preferredShift">Preferred Shift</label>
+                    <div class="select-wrapper">
+                        <select id="preferredShift" required>
+                            <option value="">Select your preferred timing...</option>
+                            <option value="08:00 AM - 05:00 PM">🌅 08:00 AM - 05:00 PM</option>
+                            <option value="09:00 AM - 06:00 PM">🏢 09:00 AM - 06:00 PM</option>
+                            <option value="10:00 AM - 07:00 PM">🕙 10:00 AM - 07:00 PM</option>
+                            <option value="11:00 AM - 08:00 PM">🕚 11:00 AM - 08:00 PM</option>
+                            <option value="12:00 PM - 09:00 PM">☀️ 12:00 PM - 09:00 PM</option>
+                            <option value="01:00 PM - 10:00 PM">🌙 01:00 PM - 10:00 PM</option>
+                            <option value="No preference">🤷‍♂️ No preference</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <div class="form-section">
-                <h2>Week Offs</h2>
-                <div class="form-group">
-                    <label for="weekoff1">Week Off 1 (Week 1) <span class="required">*</span></label>
-                    <select id="weekoff1" required aria-describedby="weekoffError">
-                        <option value="">Select day...</option>
-                    </select>
+                <div class="section-header">
+                    <span class="section-icon">📅</span>
+                    <h2>Week Offs</h2>
                 </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="weekoff1">Week 1 Off</label>
+                        <div class="select-wrapper">
+                            <select id="weekoff1" required></select>
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="weekoff2">Week Off 2 (Week 2) <span class="required">*</span></label>
-                    <select id="weekoff2" required aria-describedby="weekoffError">
-                        <option value="">Select day...</option>
-                    </select>
-                    <span id="weekoffError" class="error-message" role="alert"></span>
+                    <div class="form-group">
+                        <label for="weekoff2">Week 2 Off</label>
+                        <div class="select-wrapper">
+                            <select id="weekoff2" required></select>
+                        </div>
+                        <span id="weekoffError" class="error-message"></span>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-section">
-                <h2>Leave Request</h2>
-                <div class="toggle-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="leaveToggle" aria-controls="leaveFields">
-                        <span class="toggle-slider"></span>
-                        <span>Request Leave</span>
-                    </label>
+            <div class="form-section highlight-section">
+                <div class="section-header">
+                    <span class="section-icon">🏖️</span>
+                    <h2>Leave Request</h2>
+                    <div class="toggle-wrapper">
+                        <input type="checkbox" id="leaveToggle">
+                        <label for="leaveToggle" class="toggle-button"></label>
+                    </div>
                 </div>
 
                 <div id="leaveFields" class="conditional-fields" style="display: none;">
-                    <p class="helper-text" style="margin-bottom: 0.5rem;">Check the boxes for the days you need leave:</p>
+                    <p class="helper-text">Tap the dates you want to take off:</p>
                     
                     <div class="select-all-container">
-                         <label class="checkbox-wrapper">
+                         <label class="checkbox-tile select-all-tile">
                             <input type="checkbox" id="selectAllLeaves">
-                            <span class="custom-check"></span>
-                            <span class="label-text">Select All 14 Days</span>
+                            <span class="tile-content">Select All 14 Days</span>
                         </label>
                     </div>
 
                     <div id="leaveDatesGrid" class="leave-dates-grid"></div>
                     
-                    <span id="leaveError" class="error-message" role="alert"></span>
+                    <span id="leaveError" class="error-message"></span>
 
-                    <div class="form-group" style="margin-top: 1.5rem;">
-                        <label for="leaveReason">Leave Reason (Optional)</label>
-                        <textarea 
-                            id="leaveReason" 
-                            maxlength="150" 
-                            rows="3"
-                            placeholder="Optional reason for leave..."
-                        ></textarea>
+                    <div class="form-group mt-3">
+                        <label for="leaveReason">Reason (Optional)</label>
+                        <textarea id="leaveReason" maxlength="150" rows="2" placeholder="Going for a vacation..."></textarea>
                         <span class="char-count"><span id="leaveReasonCount">0</span>/150</span>
                     </div>
                 </div>
             </div>
 
             <div class="form-section">
-                <h2>Special Shift Requests</h2>
-                <div class="toggle-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="specialShiftToggle" aria-controls="specialShiftFields">
-                        <span class="toggle-slider"></span>
-                        <span>Request Special Shift</span>
-                    </label>
+                <div class="section-header">
+                    <span class="section-icon">⚡</span>
+                    <h2>Special Shift</h2>
+                    <div class="toggle-wrapper">
+                        <input type="checkbox" id="specialShiftToggle">
+                        <label for="specialShiftToggle" class="toggle-button"></label>
+                    </div>
                 </div>
 
                 <div id="specialShiftFields" class="conditional-fields" style="display: none;">
-                    <p class="helper-text" style="margin-bottom: 1rem;">Add specific dates where you need a different shift.</p>
                     
                     <div id="specialShiftsContainer"></div>
 
-                    <button type="button" id="addSpecialShiftBtn" class="btn-outline">+ Add Another Date</button>
-                    <span id="specialShiftError" class="error-message" role="alert"></span>
+                    <button type="button" id="addSpecialShiftBtn" class="btn-dashed">+ Add Another Date</button>
+                    <span id="specialShiftError" class="error-message"></span>
 
-                    <div class="form-group" style="margin-top: 1.5rem;">
+                    <div class="form-group mt-3">
                         <label for="specialShiftComment">Comment (Optional)</label>
-                        <textarea 
-                            id="specialShiftComment" 
-                            maxlength="150" 
-                            rows="3"
-                            placeholder="Any specific reason for these changes..."
-                        ></textarea>
+                        <textarea id="specialShiftComment" maxlength="150" rows="2" placeholder="Need early logout..."></textarea>
                         <span class="char-count"><span id="specialShiftCommentCount">0</span>/150</span>
                     </div>
                 </div>
             </div>
 
             <button type="submit" id="submitBtn" class="submit-btn" disabled>
-                Submit Preference
+                Submit Preference 🚀
             </button>
         </form>
     </main>
 
     <aside id="adminPanel" class="admin-panel" style="display: none;">
         <div class="admin-header">
-            <h2>DEV Admin Panel</h2>
-            <button id="closeAdmin" class="close-btn" aria-label="Close admin panel">×</button>
+            <h2>DEV Panel</h2>
+            <button id="closeAdmin" class="close-btn">×</button>
         </div>
         <div class="admin-stats">
             <div class="stat-card">
@@ -180,31 +173,32 @@
             </div>
         </div>
         <div class="admin-controls">
-            <button id="clearAllBtn" class="admin-btn danger">Clear All Submissions</button>
+            <button id="clearAllBtn" class="admin-btn danger">Reset All</button>
             <button id="refreshAdminBtn" class="admin-btn">Refresh</button>
         </div>
         <div id="submissionsList" class="submissions-list"></div>
     </aside>
 
-    <div id="successModal" class="modal" role="dialog" aria-labelledby="successTitle" aria-modal="true">
+    <div id="successModal" class="modal">
         <div class="modal-content">
-            <div class="success-icon">✓</div>
-            <h2 id="successTitle">Preference Submitted!</h2>
-            <p>Your roster preference has been saved successfully.</p>
+            <div class="confetti-bg"></div>
+            <div class="success-icon">✅</div>
+            <h2>Awesome!</h2>
+            <p>Your preferences have been locked in.</p>
             <div class="modal-actions">
-                <button id="shareWhatsAppBtn" class="btn btn-primary">Share on WhatsApp</button>
-                <button id="editPreferenceBtn" class="btn btn-secondary">Edit Preference</button>
+                <button id="shareWhatsAppBtn" class="btn btn-whatsapp">Share on WhatsApp 💬</button>
+                <button id="editPreferenceBtn" class="btn btn-ghost">Edit Changes</button>
             </div>
         </div>
     </div>
 
-    <div id="confirmModal" class="modal" role="dialog" aria-labelledby="confirmTitle" aria-modal="true">
+    <div id="confirmModal" class="modal">
         <div class="modal-content">
-            <h2 id="confirmTitle">Confirm Week Offs</h2>
+            <h2>Wait a sec! ✋</h2>
             <p id="confirmMessage"></p>
             <div class="modal-actions">
-                <button id="confirmYesBtn" class="btn btn-warning">Yes, Continue</button>
-                <button id="confirmNoBtn" class="btn btn-secondary">No, Change</button>
+                <button id="confirmYesBtn" class="btn btn-primary">Yes, I'm sure</button>
+                <button id="confirmNoBtn" class="btn btn-ghost">No, let me change</button>
             </div>
         </div>
     </div>
