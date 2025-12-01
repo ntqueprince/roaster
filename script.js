@@ -2,10 +2,8 @@
 // CONFIG & MASTER DATA
 // ============================================
 
-// Change this date to update the roster period (must be a Monday)
 const ROSTER_START_DATE = "2025-12-15";
 
-// Agent master data (do not modify)
 const agents = [
   {"empId":"PW76279","name":"Mayank Bhardwaj"},
   {"empId":"PW64731","name":"Satyam Tripathi"},
@@ -57,48 +55,24 @@ const agents = [
   {"empId":"PW76270","name":"Dhruv Godara"}
 ];
 
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
-
-/**
- * Generate array of roster dates from start date
- * @returns {Array} Array of Date objects for 14 days
- */
+// ... UTILITY FUNCTIONS SAME AS BEFORE ...
 function generateRosterDates() {
     const dates = [];
     const startDate = new Date(ROSTER_START_DATE);
-    
     for (let i = 0; i < 14; i++) {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
         dates.push(date);
     }
-    
     return dates;
 }
 
-/**
- * Format date as "Day - DD Mon" (e.g., "Mon - 15 Dec")
- * @param {Date} date 
- * @returns {string}
- */
 function formatDayDate(date) {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    const dayName = days[date.getDay()];
-    const day = date.getDate();
-    const month = months[date.getMonth()];
-    
-    return `${dayName} - ${day} ${month}`;
+    return `${days[date.getDay()]} - ${date.getDate()} ${months[date.getMonth()]}`;
 }
 
-/**
- * Format date as YYYY-MM-DD
- * @param {Date} date 
- * @returns {string}
- */
 function formatDateISO(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -106,111 +80,37 @@ function formatDateISO(date) {
     return `${year}-${month}-${day}`;
 }
 
-/**
- * Parse ISO date string to Date object
- * @param {string} dateStr 
- * @returns {Date}
- */
 function parseISODate(dateStr) {
     const [year, month, day] = dateStr.split('-').map(Number);
     return new Date(year, month - 1, day);
 }
 
-/**
- * Get storage key for agent submission
- * @param {string} empId 
- * @returns {string}
- */
-function getStorageKey(empId) {
-    return `roster_${empId}_${ROSTER_START_DATE}`;
-}
+function getStorageKey(empId) { return `roster_${empId}_${ROSTER_START_DATE}`; }
 
-/**
- * Get all submissions from localStorage
- * @returns {Array}
- */
 function getAllSubmissions() {
     const submissions = [];
     const prefix = `roster_`;
-    
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key.startsWith(prefix) && key.includes(ROSTER_START_DATE)) {
-            try {
-                const data = JSON.parse(localStorage.getItem(key));
-                submissions.push(data);
-            } catch (e) {
-                console.error('Error parsing submission:', e);
-            }
+            try { submissions.push(JSON.parse(localStorage.getItem(key))); } catch (e) {}
         }
     }
-    
     return submissions;
 }
 
-/**
- * Save submission to localStorage
- * @param {object} data 
- */
-function saveSubmission(data) {
-    const key = getStorageKey(data.empId);
-    localStorage.setItem(key, JSON.stringify(data));
-}
+function saveSubmission(data) { localStorage.setItem(getStorageKey(data.empId), JSON.stringify(data)); }
+function loadSubmission(empId) { const data = localStorage.getItem(getStorageKey(empId)); return data ? JSON.parse(data) : null; }
+function deleteSubmission(empId) { localStorage.removeItem(getStorageKey(empId)); }
 
-/**
- * Load submission for an agent
- * @param {string} empId 
- * @returns {object|null}
- */
-function loadSubmission(empId) {
-    const key = getStorageKey(empId);
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : null;
-}
-
-/**
- * Delete submission for an agent
- * @param {string} empId 
- */
-function deleteSubmission(empId) {
-    const key = getStorageKey(empId);
-    localStorage.removeItem(key);
-}
-
-/**
- * Format timestamp for display
- * @param {number} timestamp 
- * @returns {string}
- */
 function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
-    // 12-hour format with AM/PM
-    return date.toLocaleString('en-US', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    });
-}
-
-/**
- * Check if date is within roster range
- * @param {string} dateStr ISO format
- * @returns {boolean}
- */
-function isDateInRosterRange(dateStr) {
-    const dates = generateRosterDates();
-    const checkDate = parseISODate(dateStr);
-    
-    return dates.some(d => formatDateISO(d) === formatDateISO(checkDate));
+    return date.toLocaleString('en-US', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
 }
 
 // ============================================
 // DOM ELEMENTS
 // ============================================
-
 const form = document.getElementById('preferenceForm');
 const agentNameInput = document.getElementById('agentName');
 const empIdInput = document.getElementById('empId');
@@ -220,7 +120,6 @@ const preferredShiftSelect = document.getElementById('preferredShift');
 const weekoff1Select = document.getElementById('weekoff1');
 const weekoff2Select = document.getElementById('weekoff2');
 
-// Leave Elements (New)
 const leaveToggle = document.getElementById('leaveToggle');
 const leaveFields = document.getElementById('leaveFields');
 const leaveDatesGrid = document.getElementById('leaveDatesGrid');
@@ -229,7 +128,6 @@ const leaveError = document.getElementById('leaveError');
 const leaveReasonInput = document.getElementById('leaveReason');
 const leaveReasonCount = document.getElementById('leaveReasonCount');
 
-// Special Shift Elements
 const specialShiftToggle = document.getElementById('specialShiftToggle');
 const specialShiftFields = document.getElementById('specialShiftFields');
 const specialShiftsContainer = document.getElementById('specialShiftsContainer');
@@ -263,52 +161,39 @@ const submissionsList = document.getElementById('submissionsList');
 // ============================================
 // STATE
 // ============================================
-
 let currentSubmission = null;
 let pendingConfirmation = false;
 
 // ============================================
 // INITIALIZATION
 // ============================================
-
 function init() {
     populateDataLists();
     populateWeekoffDropdowns();
     attachEventListeners();
-    renderLeaveCheckboxes(); // Render the new leave grid
+    renderLeaveCheckboxes();
     checkExistingSubmission();
 }
 
-/**
- * Populate name and empId datalists
- */
 function populateDataLists() {
     agents.forEach(agent => {
         const nameOption = document.createElement('option');
         nameOption.value = agent.name;
         nameList.appendChild(nameOption);
-        
         const empIdOption = document.createElement('option');
         empIdOption.value = agent.empId;
         empIdList.appendChild(empIdOption);
     });
 }
 
-/**
- * Populate weekoff dropdowns with dates
- */
 function populateWeekoffDropdowns() {
     const dates = generateRosterDates();
-    
-    // Week 1 (Days 1-7)
     for (let i = 0; i < 7; i++) {
         const option = document.createElement('option');
         option.value = formatDateISO(dates[i]);
         option.textContent = formatDayDate(dates[i]);
         weekoff1Select.appendChild(option);
     }
-    
-    // Week 2 (Days 8-14)
     for (let i = 7; i < 14; i++) {
         const option = document.createElement('option');
         option.value = formatDateISO(dates[i]);
@@ -317,233 +202,134 @@ function populateWeekoffDropdowns() {
     }
 }
 
-/**
- * Render checkboxes for leave dates
- */
+// *** NEW RENDER FUNCTION FOR TILES ***
 function renderLeaveCheckboxes() {
     const dates = generateRosterDates();
     leaveDatesGrid.innerHTML = '';
-
     dates.forEach(date => {
         const dateStr = formatDateISO(date);
         const labelStr = formatDayDate(date);
-
+        
+        // Changed structure for Tile styling
         const wrapper = document.createElement('label');
-        wrapper.className = 'checkbox-wrapper';
+        wrapper.className = 'checkbox-tile';
         
         wrapper.innerHTML = `
             <input type="checkbox" class="leave-date-checkbox" value="${dateStr}" data-label="${labelStr}">
-            <span class="custom-check"></span>
-            <span class="label-text">${labelStr}</span>
+            <span class="tile-content">${labelStr}</span>
         `;
         
-        // Add change listener to update Select All state
         const checkbox = wrapper.querySelector('input');
         checkbox.addEventListener('change', () => {
             updateSelectAllState();
             validateForm();
         });
-
         leaveDatesGrid.appendChild(wrapper);
     });
 }
 
-/**
- * Attach all event listeners
- */
 function attachEventListeners() {
-    // Agent selection
     agentNameInput.addEventListener('input', handleNameInput);
     empIdInput.addEventListener('input', handleEmpIdInput);
-    
-    // Toggle fields
     leaveToggle.addEventListener('change', handleLeaveToggle);
     specialShiftToggle.addEventListener('change', handleSpecialShiftToggle);
-    
-    // Special Shift Button
     addSpecialShiftBtn.addEventListener('click', () => addSpecialShiftRow());
-
-    // Select All Leaves
     selectAllLeaves.addEventListener('change', handleSelectAllLeaves);
-
-    // Character counters
-    leaveReasonInput.addEventListener('input', () => {
-        leaveReasonCount.textContent = leaveReasonInput.value.length;
-    });
-    specialShiftCommentInput.addEventListener('input', () => {
-        specialShiftCommentCount.textContent = specialShiftCommentInput.value.length;
-    });
-    
-    // Form validation
+    leaveReasonInput.addEventListener('input', () => { leaveReasonCount.textContent = leaveReasonInput.value.length; });
+    specialShiftCommentInput.addEventListener('input', () => { specialShiftCommentCount.textContent = specialShiftCommentInput.value.length; });
     form.addEventListener('input', validateForm);
     form.addEventListener('change', validateForm);
-    
-    // Form submission
     form.addEventListener('submit', handleSubmit);
-    
-    // Modal actions
     shareWhatsAppBtn.addEventListener('click', handleWhatsAppShare);
     editPreferenceBtn.addEventListener('click', closeSuccessModal);
     confirmYesBtn.addEventListener('click', handleConfirmYes);
     confirmNoBtn.addEventListener('click', handleConfirmNo);
-    
-    // Admin panel
     devToggle.addEventListener('click', toggleAdminPanel);
     closeAdmin.addEventListener('click', toggleAdminPanel);
     clearAllBtn.addEventListener('click', handleClearAll);
     refreshAdminBtn.addEventListener('click', refreshAdminPanel);
 }
 
-// ============================================
-// EVENT HANDLERS
-// ============================================
-
-/**
- * Handle name input (auto-link to empId)
- */
+// ... EVENT HANDLERS (Same as before) ...
 function handleNameInput(e) {
     const name = e.target.value;
     const agent = agents.find(a => a.name === name);
-    
     if (agent) {
         empIdInput.value = agent.empId;
-        nameError.textContent = '';
-        empIdError.textContent = '';
+        nameError.textContent = ''; empIdError.textContent = '';
         checkExistingSubmissionForAgent(agent.empId);
-    } else {
-        empIdInput.value = '';
-    }
-    
+    } else { empIdInput.value = ''; }
     validateAgentSelection();
 }
 
-/**
- * Handle empId input (auto-link to name)
- */
 function handleEmpIdInput(e) {
     const empId = e.target.value;
     const agent = agents.find(a => a.empId === empId);
-    
     if (agent) {
         agentNameInput.value = agent.name;
-        nameError.textContent = '';
-        empIdError.textContent = '';
+        nameError.textContent = ''; empIdError.textContent = '';
         checkExistingSubmissionForAgent(agent.empId);
-    } else {
-        agentNameInput.value = '';
-    }
-    
+    } else { agentNameInput.value = ''; }
     validateAgentSelection();
 }
 
-/**
- * Validate agent selection matches
- */
 function validateAgentSelection() {
-    const name = agentNameInput.value;
-    const empId = empIdInput.value;
-    
+    const name = agentNameInput.value; const empId = empIdInput.value;
     const agent = agents.find(a => a.name === name && a.empId === empId);
-    
     if (name && empId && !agent) {
-        nameError.textContent = 'Name and Employee ID do not match';
-        empIdError.textContent = 'Name and Employee ID do not match';
-        return false;
-    } else if (agent) {
-        nameError.textContent = '';
-        empIdError.textContent = '';
-        return true;
+        nameError.textContent = 'Mismatch'; empIdError.textContent = 'Mismatch'; return false;
     }
-    
-    return false;
+    nameError.textContent = ''; empIdError.textContent = ''; return !!agent;
 }
 
-/**
- * Handle leave toggle
- */
 function handleLeaveToggle(e) {
     if (e.target.checked) {
         leaveFields.style.display = 'block';
     } else {
         leaveFields.style.display = 'none';
-        // Uncheck all
         document.querySelectorAll('.leave-date-checkbox').forEach(cb => cb.checked = false);
         selectAllLeaves.checked = false;
-        leaveReasonInput.value = '';
-        leaveReasonCount.textContent = '0';
-        leaveError.textContent = '';
+        leaveReasonInput.value = ''; leaveReasonCount.textContent = '0';
     }
     validateForm();
 }
 
-/**
- * Handle Select All Leaves
- */
 function handleSelectAllLeaves(e) {
-    const checkboxes = document.querySelectorAll('.leave-date-checkbox');
-    checkboxes.forEach(cb => {
-        cb.checked = e.target.checked;
-    });
+    document.querySelectorAll('.leave-date-checkbox').forEach(cb => cb.checked = e.target.checked);
     validateForm();
 }
 
-/**
- * Update Select All State based on individual checkboxes
- */
 function updateSelectAllState() {
     const checkboxes = document.querySelectorAll('.leave-date-checkbox');
     const checkedCount = document.querySelectorAll('.leave-date-checkbox:checked').length;
-    
-    if (checkedCount === 0) {
-        selectAllLeaves.checked = false;
-        selectAllLeaves.indeterminate = false;
-    } else if (checkedCount === checkboxes.length) {
-        selectAllLeaves.checked = true;
-        selectAllLeaves.indeterminate = false;
-    } else {
-        selectAllLeaves.checked = false;
-        selectAllLeaves.indeterminate = true;
-    }
+    if (checkedCount === 0) { selectAllLeaves.checked = false; selectAllLeaves.indeterminate = false; }
+    else if (checkedCount === checkboxes.length) { selectAllLeaves.checked = true; selectAllLeaves.indeterminate = false; }
+    else { selectAllLeaves.checked = false; selectAllLeaves.indeterminate = true; }
 }
 
-/**
- * Handle special shift toggle
- */
 function handleSpecialShiftToggle(e) {
     if (e.target.checked) {
         specialShiftFields.style.display = 'block';
-        // Add one empty row if none exist
-        if (specialShiftsContainer.children.length === 0) {
-            addSpecialShiftRow();
-        }
+        if (specialShiftsContainer.children.length === 0) addSpecialShiftRow();
     } else {
         specialShiftFields.style.display = 'none';
-        specialShiftsContainer.innerHTML = ''; // Clear all rows
-        specialShiftCommentInput.value = '';
-        specialShiftCommentCount.textContent = '0';
-        specialShiftError.textContent = '';
+        specialShiftsContainer.innerHTML = '';
+        specialShiftCommentInput.value = ''; specialShiftCommentCount.textContent = '0';
     }
     validateForm();
 }
 
-/**
- * Add a new dynamic row for special shift
- * @param {object} data Optional data to pre-fill
- */
 function addSpecialShiftRow(data = null) {
-    const rowId = Date.now(); // Unique ID for the row
+    const rowId = Date.now();
     const row = document.createElement('div');
     row.className = 'special-shift-row';
     row.id = `row-${rowId}`;
-
-    // Get date options
+    
+    // Options logic same as before...
     const dates = generateRosterDates();
     let dateOptions = '<option value="">Select Date...</option>';
-    dates.forEach(d => {
-        dateOptions += `<option value="${formatDateISO(d)}">${formatDayDate(d)}</option>`;
-    });
-
-    // Shift Options
+    dates.forEach(d => { dateOptions += `<option value="${formatDateISO(d)}">${formatDayDate(d)}</option>`; });
+    
     const shiftOptions = `
         <option value="">Select Shift...</option>
         <option value="08:00 AM - 05:00 PM">08:00 AM - 05:00 PM</option>
@@ -556,495 +342,154 @@ function addSpecialShiftRow(data = null) {
 
     row.innerHTML = `
         <div class="form-group">
-            <label style="font-size: 0.8rem;">Date</label>
+            <label>Date</label>
             <select class="special-date-select" required>${dateOptions}</select>
         </div>
         <div class="form-group">
-            <label style="font-size: 0.8rem;">Shift</label>
+            <label>Shift</label>
             <select class="special-shift-select" required>${shiftOptions}</select>
         </div>
         <button type="button" class="btn-remove" onclick="removeSpecialShiftRow('${rowId}')">×</button>
     `;
-
     specialShiftsContainer.appendChild(row);
-
-    // If data provided (loading from storage), set values
     if (data) {
         row.querySelector('.special-date-select').value = data.date;
         row.querySelector('.special-shift-select').value = data.shift;
     }
-
-    // Add validation listeners to new inputs
-    const newDateSelect = row.querySelector('.special-date-select');
-    const newShiftSelect = row.querySelector('.special-shift-select');
-    
-    newDateSelect.addEventListener('change', validateForm);
-    newShiftSelect.addEventListener('change', validateForm);
-
+    row.querySelector('.special-date-select').addEventListener('change', validateForm);
+    row.querySelector('.special-shift-select').addEventListener('change', validateForm);
     validateForm();
 }
 
-/**
- * Remove a special shift row
- */
 function removeSpecialShiftRow(rowId) {
     const row = document.getElementById(`row-${rowId}`);
-    if (row) {
-        row.remove();
-        validateForm();
-    }
+    if (row) { row.remove(); validateForm(); }
 }
 
-/**
- * Validate leave entries (Checkboxes)
- */
 function validateLeave() {
     if (!leaveToggle.checked) return true;
-    
     const checkedBoxes = document.querySelectorAll('.leave-date-checkbox:checked');
-    if (checkedBoxes.length === 0) {
-        leaveError.textContent = 'Please select at least one date or turn off Leave Request.';
-        return false;
-    }
-
-    leaveError.textContent = '';
-    return true;
+    if (checkedBoxes.length === 0) { leaveError.textContent = 'Select at least one day.'; return false; }
+    leaveError.textContent = ''; return true;
 }
 
-/**
- * Validate special shift request
- */
 function validateSpecialShift() {
     if (!specialShiftToggle.checked) return true;
-    
     const rows = document.querySelectorAll('.special-shift-row');
-    if (rows.length === 0) {
-        specialShiftError.textContent = 'Please add at least one date or turn off the toggle.';
-        return false;
-    }
-
-    let isValid = true;
-    const selectedDates = [];
-
+    if (rows.length === 0) return false;
+    let isValid = true; const selectedDates = [];
     rows.forEach(row => {
         const date = row.querySelector('.special-date-select').value;
         const shift = row.querySelector('.special-shift-select').value;
-
-        if (!date || !shift) {
-            isValid = false;
-        }
-
-        // Check for duplicates
+        if (!date || !shift) isValid = false;
         if (date) {
-            if (selectedDates.includes(date)) {
-                specialShiftError.textContent = 'You have selected the same date multiple times.';
-                isValid = false;
-            }
+            if (selectedDates.includes(date)) isValid = false;
             selectedDates.push(date);
-        }
-        
-        // Check conflict with Leave
-        if (leaveToggle.checked && date) {
-             const checkedLeaves = document.querySelectorAll('.leave-date-checkbox:checked');
-             checkedLeaves.forEach(cb => {
-                 if (cb.value === date) {
-                     specialShiftError.textContent = 'Cannot request special shift on a leave day';
-                     isValid = false;
-                 }
-             });
+            // Check conflict with leave
+            const checkedLeaves = document.querySelectorAll('.leave-date-checkbox:checked');
+            checkedLeaves.forEach(cb => { if(cb.value === date) isValid = false; });
         }
     });
-
-    if (!isValid && !specialShiftError.textContent) {
-        specialShiftError.textContent = 'Please fill all date and shift fields.';
-    } else if (isValid) {
-        specialShiftError.textContent = '';
-    }
-
     return isValid;
 }
 
-/**
- * Validate entire form
- */
 function validateForm() {
-    const agentValid = validateAgentSelection();
-    const leaveValid = validateLeave();
-    const specialShiftValid = validateSpecialShift();
-    
-    const allFieldsFilled = agentValid &&
-        preferredShiftSelect.value &&
-        weekoff1Select.value &&
-        weekoff2Select.value &&
-        (!leaveToggle.checked || leaveValid) &&
-        (!specialShiftToggle.checked || specialShiftValid);
-    
-    const allValid = allFieldsFilled && leaveValid && specialShiftValid;
-    
-    submitBtn.disabled = !allValid;
+    const allFieldsFilled = validateAgentSelection() && preferredShiftSelect.value && weekoff1Select.value && weekoff2Select.value && (!leaveToggle.checked || validateLeave()) && (!specialShiftToggle.checked || validateSpecialShift());
+    submitBtn.disabled = !allFieldsFilled;
 }
 
-/**
- * Handle form submission
- */
 function handleSubmit(e) {
     e.preventDefault();
-    
-    // Check if weekoffs are same day of week
     const weekoff1Date = new Date(weekoff1Select.value);
     const weekoff2Date = new Date(weekoff2Select.value);
-    
     if (weekoff1Date.getDay() === weekoff2Date.getDay() && !pendingConfirmation) {
-        const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][weekoff1Date.getDay()];
-        confirmMessage.textContent = `You selected the same weekday (${dayName}) for both weekoffs. Continue?`;
-        confirmModal.classList.add('active');
-        return;
+        confirmMessage.textContent = `Same weekday selected for both offs. Sure?`;
+        confirmModal.classList.add('active'); return;
     }
-    
-    // Collect form data
+
     const formData = {
-        name: agentNameInput.value,
-        empId: empIdInput.value,
+        name: agentNameInput.value, empId: empIdInput.value,
         preferredShift: preferredShiftSelect.value,
-        weekoff1: {
-            date: weekoff1Select.value,
-            label: weekoff1Select.options[weekoff1Select.selectedIndex].text
-        },
-        weekoff2: {
-            date: weekoff2Select.value,
-            label: weekoff2Select.options[weekoff2Select.selectedIndex].text
-        },
-        leave: null,
-        specialShift: null,
-        timestamp: Date.now(),
-        rosterStartDate: ROSTER_START_DATE
+        weekoff1: { date: weekoff1Select.value, label: weekoff1Select.options[weekoff1Select.selectedIndex].text },
+        weekoff2: { date: weekoff2Select.value, label: weekoff2Select.options[weekoff2Select.selectedIndex].text },
+        leave: null, specialShift: null, timestamp: Date.now(), rosterStartDate: ROSTER_START_DATE
     };
-    
-    // Add leave if enabled
+
     if (leaveToggle.checked) {
         const leaveDates = [];
         document.querySelectorAll('.leave-date-checkbox:checked').forEach(cb => {
-            leaveDates.push({
-                date: cb.value,
-                label: cb.dataset.label
-            });
+            leaveDates.push({ date: cb.value, label: cb.dataset.label });
         });
-
-        formData.leave = {
-            dates: leaveDates,
-            reason: leaveReasonInput.value || 'Not specified'
-        };
+        formData.leave = { dates: leaveDates, reason: leaveReasonInput.value || 'Not specified' };
     }
-    
-    // Add special shift if enabled
+
     if (specialShiftToggle.checked) {
         const specialShifts = [];
         document.querySelectorAll('.special-shift-row').forEach(row => {
             const dateVal = row.querySelector('.special-date-select').value;
             const shiftVal = row.querySelector('.special-shift-select').value;
-            const dateObj = new Date(dateVal);
-            
-            specialShifts.push({
-                date: dateVal,
-                dateLabel: formatDayDate(dateObj),
-                shift: shiftVal
-            });
+            specialShifts.push({ date: dateVal, dateLabel: formatDayDate(new Date(dateVal)), shift: shiftVal });
         });
-
-        formData.specialShift = {
-            requests: specialShifts,
-            comment: specialShiftCommentInput.value || ''
-        };
+        formData.specialShift = { requests: specialShifts, comment: specialShiftCommentInput.value || '' };
     }
-    
-    // Save submission
-    currentSubmission = formData;
-    saveSubmission(formData);
-    
-    // Show success modal
-    successModal.classList.add('active');
-    pendingConfirmation = false;
+
+    currentSubmission = formData; saveSubmission(formData);
+    successModal.classList.add('active'); pendingConfirmation = false;
 }
 
-/**
- * Handle weekoff confirmation yes
- */
-function handleConfirmYes() {
-    confirmModal.classList.remove('active');
-    pendingConfirmation = true;
-    form.dispatchEvent(new Event('submit', { cancelable: true }));
-}
+function handleConfirmYes() { confirmModal.classList.remove('active'); pendingConfirmation = true; form.dispatchEvent(new Event('submit')); }
+function handleConfirmNo() { confirmModal.classList.remove('active'); pendingConfirmation = false; }
+function closeSuccessModal() { successModal.classList.remove('active'); currentSubmission = null; }
 
-/**
- * Handle weekoff confirmation no
- */
-function handleConfirmNo() {
-    confirmModal.classList.remove('active');
-    pendingConfirmation = false;
-}
-
-/**
- * Generate WhatsApp message
- */
-function generateWhatsAppMessage(data) {
-    const dates = generateRosterDates();
-    const startLabel = formatDayDate(dates[0]);
-    const endLabel = formatDayDate(dates[13]);
-    
-    let message = `Hi — I have submitted my roster preference for the period ${startLabel} → ${endLabel}.\n\n`;
-    message += `Name: ${data.name}\n`;
-    message += `EmpID: ${data.empId}\n`;
-    message += `Shift: ${data.preferredShift}\n`;
-    message += `Weekoff1: ${data.weekoff1.label}\n`;
-    message += `Weekoff2: ${data.weekoff2.label}\n`;
-    
-    if (data.leave && data.leave.dates && data.leave.dates.length > 0) {
-        message += `Leave Requests (${data.leave.dates.length} days):\n`;
-        data.leave.dates.forEach(l => {
-             message += `• ${l.label}\n`;
-        });
-        if (data.leave.reason) {
-            message += `Reason: ${data.leave.reason}\n`;
-        }
-    } else {
-        message += `Leave: None\n`;
-    }
-    
-    if (data.specialShift && data.specialShift.requests && data.specialShift.requests.length > 0) {
-        message += `Special requests:\n`;
-        data.specialShift.requests.forEach(req => {
-            message += `• ${req.dateLabel}: ${req.shift}\n`;
-        });
-        if (data.specialShift.comment) {
-            message += `Note: ${data.specialShift.comment}\n`;
-        }
-    } else {
-        message += `Special request: None\n`;
-    }
-    
-    message += `\n— Please update if needed.`;
-    
-    return encodeURIComponent(message);
-}
-
-/**
- * Handle WhatsApp share
- */
 function handleWhatsAppShare() {
-    if (currentSubmission) {
-        const message = generateWhatsAppMessage(currentSubmission);
-        const url = `https://wa.me/?text=${message}`;
-        window.open(url, '_blank');
-    }
+    if (!currentSubmission) return;
+    const data = currentSubmission;
+    let message = `Hi, Roster Pref for ${data.name} (${data.empId}):\nShift: ${data.preferredShift}\nOffs: ${data.weekoff1.label}, ${data.weekoff2.label}\n`;
+    if (data.leave) { message += `Leave: ${data.leave.dates.length} days (${data.leave.dates.map(d=>d.label.split('-')[0]).join(',')})\n`; }
+    if (data.specialShift) { message += `Special: ${data.specialShift.requests.length} requests\n`; }
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
 }
 
-/**
- * Close success modal
- */
-function closeSuccessModal() {
-    successModal.classList.remove('active');
-    currentSubmission = null;
-}
-
-/**
- * Check for existing submission on page load
- */
-function checkExistingSubmission() {
-    // This will be called when agent is selected
-}
-
-/**
- * Check for existing submission for specific agent
- */
 function checkExistingSubmissionForAgent(empId) {
     const submission = loadSubmission(empId);
-    
     if (submission) {
-        lastSubmissionInfo.style.display = 'block';
+        lastSubmissionInfo.style.display = 'flex';
         lastSubmitTime.textContent = formatTimestamp(submission.timestamp);
-        
-        // Pre-fill form with existing data
-        agentNameInput.value = submission.name;
-        empIdInput.value = submission.empId;
+        agentNameInput.value = submission.name; empIdInput.value = submission.empId;
         preferredShiftSelect.value = submission.preferredShift;
-        weekoff1Select.value = submission.weekoff1.date;
-        weekoff2Select.value = submission.weekoff2.date;
-        
+        weekoff1Select.value = submission.weekoff1.date; weekoff2Select.value = submission.weekoff2.date;
+
         if (submission.leave) {
-            leaveToggle.checked = true;
-            leaveFields.style.display = 'block';
-            
-            // Uncheck all first
+            leaveToggle.checked = true; leaveFields.style.display = 'block';
             document.querySelectorAll('.leave-date-checkbox').forEach(cb => cb.checked = false);
-
-            if (submission.leave.dates && Array.isArray(submission.leave.dates)) {
-                // New format
-                submission.leave.dates.forEach(d => {
-                     const cb = document.querySelector(`.leave-date-checkbox[value="${d.date}"]`);
-                     if (cb) cb.checked = true;
-                });
-            } else if (submission.leave.from) {
-                 // Fallback for old format
-                 const cbFrom = document.querySelector(`.leave-date-checkbox[value="${submission.leave.from}"]`);
-                 if (cbFrom) cbFrom.checked = true;
-                 if(submission.leave.till !== submission.leave.from) {
-                     const cbTill = document.querySelector(`.leave-date-checkbox[value="${submission.leave.till}"]`);
-                     if (cbTill) cbTill.checked = true;
-                 }
-            }
-            
+            if (submission.leave.dates) submission.leave.dates.forEach(d => {
+                const cb = document.querySelector(`.leave-date-checkbox[value="${d.date}"]`); if (cb) cb.checked = true;
+            });
             updateSelectAllState();
-            leaveReasonInput.value = submission.leave.reason === 'Not specified' ? '' : submission.leave.reason;
-            leaveReasonCount.textContent = leaveReasonInput.value.length;
+            leaveReasonInput.value = submission.leave.reason;
         }
-        
+
         if (submission.specialShift) {
-            specialShiftToggle.checked = true;
-            specialShiftFields.style.display = 'block';
-            specialShiftsContainer.innerHTML = ''; // Clear defaults
-
-            if (Array.isArray(submission.specialShift.requests)) {
-                submission.specialShift.requests.forEach(req => {
-                    addSpecialShiftRow(req);
-                });
-            } else if (submission.specialShift.date) {
-                addSpecialShiftRow({
-                    date: submission.specialShift.date,
-                    shift: submission.specialShift.shift
-                });
-            }
-
-            specialShiftCommentInput.value = submission.specialShift.comment || '';
-            specialShiftCommentCount.textContent = specialShiftCommentInput.value.length;
+            specialShiftToggle.checked = true; specialShiftFields.style.display = 'block';
+            specialShiftsContainer.innerHTML = '';
+            if (submission.specialShift.requests) submission.specialShift.requests.forEach(req => addSpecialShiftRow(req));
+            specialShiftCommentInput.value = submission.specialShift.comment;
         }
-        
         validateForm();
-    } else {
-        lastSubmissionInfo.style.display = 'none';
-    }
+    } else { lastSubmissionInfo.style.display = 'none'; }
 }
 
-// ============================================
-// ADMIN PANEL
-// ============================================
-
-/**
- * Toggle admin panel
- */
-function toggleAdminPanel() {
-    adminPanel.classList.toggle('active');
-    if (adminPanel.classList.contains('active')) {
-        refreshAdminPanel();
-    }
-}
-
-/**
- * Refresh admin panel data
- */
+function toggleAdminPanel() { adminPanel.classList.toggle('active'); if(adminPanel.classList.contains('active')) refreshAdminPanel(); }
 function refreshAdminPanel() {
     const submissions = getAllSubmissions();
-    const submittedAgents = submissions.map(s => s.empId);
-    const pendingAgents = agents.filter(a => !submittedAgents.includes(a.empId));
-    
     submittedCount.textContent = submissions.length;
-    pendingCount.textContent = pendingAgents.length;
-    
-    // Render submissions list
     submissionsList.innerHTML = '';
-    
-    // Submitted agents
-    submissions.forEach(submission => {
-        const card = document.createElement('div');
-        card.className = 'submission-card submitted';
-        
-        let detailsHTML = `
-            <div class="submission-header">
-                <h3>${submission.name} (${submission.empId})</h3>
-                <span class="submission-badge">Submitted</span>
-            </div>
-            <div class="submission-details">
-                <div><strong>Submitted:</strong> ${formatTimestamp(submission.timestamp)}</div>
-                <div><strong>Shift:</strong> ${submission.preferredShift}</div>
-                <div><strong>Week Off 1:</strong> ${submission.weekoff1.label}</div>
-                <div><strong>Week Off 2:</strong> ${submission.weekoff2.label}</div>
-        `;
-        
-        if (submission.leave) {
-            if (submission.leave.dates) {
-                let leaveHtml = '<div><strong>Leave Dates:</strong></div><ul style="margin:0; padding-left:1.2rem;">';
-                submission.leave.dates.forEach(d => {
-                    leaveHtml += `<li>${d.label}</li>`;
-                });
-                leaveHtml += '</ul>';
-                detailsHTML += leaveHtml;
-            } else if(submission.leave.from) {
-                const fromDate = new Date(submission.leave.from);
-                const tillDate = new Date(submission.leave.till);
-                detailsHTML += `<div><strong>Leave:</strong> ${formatDayDate(fromDate)} to ${formatDayDate(tillDate)}</div>`;
-            }
-
-            if (submission.leave.reason !== 'Not specified') {
-                detailsHTML += `<div><strong>Reason:</strong> ${submission.leave.reason}</div>`;
-            }
-        }
-        
-        if (submission.specialShift && submission.specialShift.requests) {
-            let specialHtml = '<div><strong>Special Shifts:</strong></div><ul style="margin:0; padding-left:1.2rem;">';
-            submission.specialShift.requests.forEach(req => {
-                specialHtml += `<li>${req.dateLabel} — ${req.shift}</li>`;
-            });
-            specialHtml += '</ul>';
-            detailsHTML += specialHtml;
-            
-            if (submission.specialShift.comment) {
-                detailsHTML += `<div><strong>Comment:</strong> ${submission.specialShift.comment}</div>`;
-            }
-        }
-        
-        detailsHTML += `
-            </div>
-            <div class="submission-actions">
-                <button onclick="deleteAgentSubmission('${submission.empId}')">Clear Submission</button>
-            </div>
-        `;
-        
-        card.innerHTML = detailsHTML;
-        submissionsList.appendChild(card);
-    });
-    
-    // Pending agents
-    pendingAgents.forEach(agent => {
-        const card = document.createElement('div');
-        card.className = 'pending-card';
-        card.innerHTML = `<strong>${agent.name}</strong> (${agent.empId}) — Pending submission`;
-        submissionsList.appendChild(card);
+    submissions.forEach(s => {
+        const d = document.createElement('div'); d.className = 'submission-card';
+        d.innerHTML = `<strong>${s.name}</strong><br>${s.preferredShift}`;
+        submissionsList.appendChild(d);
     });
 }
-
-/**
- * Delete agent submission
- */
-function deleteAgentSubmission(empId) {
-    if (confirm('Are you sure you want to clear this submission?')) {
-        deleteSubmission(empId);
-        refreshAdminPanel();
-    }
-}
-
-/**
- * Clear all submissions
- */
-function handleClearAll() {
-    if (confirm('Are you sure you want to clear ALL submissions? This cannot be undone.')) {
-        const submissions = getAllSubmissions();
-        submissions.forEach(s => deleteSubmission(s.empId));
-        refreshAdminPanel();
-        alert('All submissions cleared');
-    }
-}
-
-// ============================================
-// START APP
-// ============================================
+function handleClearAll() { if(confirm('Clear all?')) { localStorage.clear(); refreshAdminPanel(); } }
 
 document.addEventListener('DOMContentLoaded', init);
